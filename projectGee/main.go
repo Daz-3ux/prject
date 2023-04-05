@@ -8,10 +8,8 @@ import (
 )
 
 func main() {
-	// New create gee instance
 	r := gee.New();
 
-	// GET add route(now only support static route)
 	r.GET("/", func(w http.ResponseWriter, req *http.Request) {
 		fmt.Fprintf(w, "URL.Path = %q\n", req.URL.Path)
 	})
