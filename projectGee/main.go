@@ -9,10 +9,13 @@ import (
 func main() {
 	r := gee.New();
 
+	// hanler 的参数变为 gee.Context
+	// 提供了查询 Query/PostForm 参数功能
+	// 封装了 HTML/String/JSON, 能够快速构造 HTTP 响应
 	r.GET("/", func(c *gee.Context) {
 		c.HTML(http.StatusOK, "<h1>Hello Gee</h1>")
 	})
-
+	
 	r.GET("/hello", func(c *gee.Context) {
 		c.String(http.StatusOK, "hello %s, you're at %s\n",c.Query("name"), c.Path)
 	})

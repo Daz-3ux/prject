@@ -30,6 +30,7 @@ func (engine *Engine) RUN(addr string)(err error) {
 	return http.ListenAndServe(addr, engine)
 }
 
+// 接管所有的 HTTP 请求
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	c := newContext(w, req)
 	engine.router.handle(c)
