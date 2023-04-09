@@ -4,9 +4,11 @@ import (
 	"net/http"
 
 	"gee"
+	"runtime/debug"
 )
 
 func main() {
+	debug.SetTraceback("all")
 	r := gee.New();
 
 	// hanler 的参数变为 gee.Context

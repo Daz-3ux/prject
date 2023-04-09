@@ -22,6 +22,7 @@ type Context struct {
 	StatusCode int
 }
 
+// 很重要! newContext 重点不是在 new, 其意义为 `填充`,读取w与r的信息(已经被写好了),然后等着被执行
 func newContext(w http.ResponseWriter, r *http.Request) *Context {
 	return &Context{
 		Writer: w,
