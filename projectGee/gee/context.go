@@ -1,9 +1,9 @@
 package gee
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"encoding/json"
 )
 
 // 为了代码简洁,为复杂类型起别名
@@ -16,18 +16,23 @@ type Context struct {
 	Writer http.ResponseWriter
 	Req    *http.Request
 	// request info
-	Path string
+	Path   string
 	Method string
+	Params map[string]string
 	// response info
 	StatusCode int
 }
 
-// 很重要! newContext 重点不是在 new, 其意义为 `填充`,读取w与r的信息(已经被写好了),然后等着被执行
+func (c *Context) Param(key string) string {
+	value, _ := c.Params[key]
+	return value
+}
+
 func newContext(w http.ResponseWriter, r *http.Request) *Context {
 	return &Context{
 		Writer: w,
-		Req: r,
-		Path: r.URL.Path,
+		Req:    r,
+		Path:   r.URL.Path,
 		Method: r.Method,
 	}
 }
