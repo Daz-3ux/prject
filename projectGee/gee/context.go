@@ -1,9 +1,9 @@
 package gee
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"encoding/json"
 )
 
 type H map[string]interface{}
@@ -13,17 +13,23 @@ type Context struct {
 	Writer http.ResponseWriter
 	Req    *http.Request
 	// request info
-	Path string
+	Path   string
 	Method string
+	Params map[string]string
 	// response info
 	StatusCode int
+}
+
+func (c *Context) Param(key string) string {
+	value, _ := c.Params[key]
+	return value
 }
 
 func newContext(w http.ResponseWriter, r *http.Request) *Context {
 	return &Context{
 		Writer: w,
-		Req: r,
-		Path: r.URL.Path,
+		Req:    r,
+		Path:   r.URL.Path,
 		Method: r.Method,
 	}
 }

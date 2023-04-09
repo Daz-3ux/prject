@@ -26,7 +26,7 @@ func (engine *Engine) POST(pattern string, handler HandlerFunc) {
 	engine.addRoute("POST", pattern, handler)
 }
 
-func (engine *Engine) RUN(addr string)(err error) {
+func (engine *Engine) RUN(addr string) (err error) {
 	return http.ListenAndServe(addr, engine)
 }
 
