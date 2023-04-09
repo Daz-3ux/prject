@@ -7,7 +7,11 @@ import (
 )
 
 type router struct {
-	roots    map[string]*node
+	// 使用 roots 来存储每种请求的 Tire树 根节点
+	// eg: roots['SET'] roots['POST']
+	roots map[string]*node
+	// 使用 handlers 存储每种请求的 HandlerFunc
+	// eg: handlers['GET=/p/:lang/doc'] handlers['POST-/p/book']
 	handlers map[string]HandlerFunc
 }
 
@@ -18,6 +22,7 @@ func newRouter() *router {
 	}
 }
 
+// only one * is allowed
 func parsePattern(pattern string) []string {
 	vs := strings.Split(pattern, "/")
 

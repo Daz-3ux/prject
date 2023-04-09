@@ -9,7 +9,7 @@ import (
 
 func main() {
 	debug.SetTraceback("all")
-	r := gee.New();
+	r := gee.New()
 
 	// hanler 的参数变为 gee.Context
 	// 提供了查询 Query/PostForm 参数功能
@@ -17,7 +17,7 @@ func main() {
 	r.GET("/", func(c *gee.Context) {
 		c.HTML(http.StatusOK, "<h1>Hello Gee</h1>")
 	})
-	
+
 	r.GET("/hello", func(c *gee.Context) {
 		// expect /hello?name=daz
 		c.String(http.StatusOK, "hello %s, you're at %s\n", c.Query("name"), c.Path)
