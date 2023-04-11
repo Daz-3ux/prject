@@ -10,7 +10,7 @@ import (
 type router struct {
 	// 使用 roots 来存储每种请求的 Tire树 根节点
 	// eg: roots['SET'] roots['POST']
-	roots map[string]*node
+	roots    map[string]*node
 	// 使用 handlers 存储每种请求的 HandlerFunc
 	// eg: handlers['GET=/p/:lang/doc'] handlers['POST-/p/book']
 	handlers map[string]HandlerFunc
@@ -43,10 +43,9 @@ func parsePattern(pattern string) []string {
 // 加路由方法
 func (r *router) addRoute(method string, pattern string, handler HandlerFunc) {
 	log.Printf("Route %4s - %s", method, pattern)
-	// parts
+
 	parts := parsePattern(pattern)
 	key := method + "-" + pattern
-	fmt.Println("method: ", method, "parts: ", parts, "key: ", key)
 	_, ok := r.roots[method]
 	if !ok {
 		r.roots[method] = &node{}
