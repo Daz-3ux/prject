@@ -25,6 +25,7 @@ func main() {
 
 	r.GET("/hello/:name", func(c *gee.Context) {
 		// expect /hello/daz
+		// 模糊匹配需要使用 Parma 获取详细信息
 		c.String(http.StatusOK, "hello %s, you're at %s\n", c.Param("name"), c.Path)
 	})
 

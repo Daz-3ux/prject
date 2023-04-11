@@ -1,6 +1,7 @@
 package gee
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -52,8 +53,11 @@ func (n *node) insert(pattern string, parts []string, height int) {
 		return
 	}
 
+	// part 是当前节点的
 	part := parts[height]
+	// child 是当前节点的 *node 列表
 	child := n.matchChild(part)
+	fmt.Println("height: ", height, "part: ", part, "child: ", child)
 	if child == nil {
 		// 没有匹配上,就进行生成,放到 n 节点的自列表
 		child = &node{part: part, isWild: part[0] == ':' || part[0] == '*'}
@@ -63,6 +67,7 @@ func (n *node) insert(pattern string, parts []string, height int) {
 	child.insert(pattern, parts, height+1)
 }
 
+// 在路由树中查找与输入路径最匹配的节点，并返回该节点
 func (n *node) search(parts []string, height int) *node {
 	// 递归终止条件:找到 末尾/通配符
 	if len(parts) == height || strings.HasPrefix(n.part, "*") {
@@ -73,12 +78,13 @@ func (n *node) search(parts []string, height int) *node {
 		return n
 	}
 
+	// 获取当前高度下的 part
 	part := parts[height]
 	// 获取所有可能的子路径
 	children := n.matchChildren(part)
 
+	// 对每个匹配的子节点进行递归查找
 	for _, child := range children {
-		// 对于每条路径都用下一part去查找
 		result := child.search(parts, height+1)
 		if result != nil {
 			// 找到了就返回

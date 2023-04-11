@@ -1,6 +1,7 @@
 package gee
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -27,7 +28,16 @@ func (engine *Engine) POST(pattern string, handler HandlerFunc) {
 }
 
 func (engine *Engine) RUN(addr string) (err error) {
+	engine.returnRoute("GET", "/")
+	engine.returnRoute("GET", "/hello/:name")
+	engine.returnRoute("POST", "/login")
 	return http.ListenAndServe(addr, engine)
+}
+
+// just for debug(with a ugly way)
+func (engine *Engine) returnRoute(method string, pattern string) {
+	node, params := engine.router.getRoute(method, pattern)
+	fmt.Println("node = ", node, "params = ", params)
 }
 
 // 接管所有的 HTTP 请求

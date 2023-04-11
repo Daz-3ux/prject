@@ -23,11 +23,6 @@ type Context struct {
 	StatusCode int
 }
 
-func (c *Context) Param(key string) string {
-	value, _ := c.Params[key]
-	return value
-}
-
 func newContext(w http.ResponseWriter, r *http.Request) *Context {
 	return &Context{
 		Writer: w,
@@ -35,6 +30,11 @@ func newContext(w http.ResponseWriter, r *http.Request) *Context {
 		Path:   r.URL.Path,
 		Method: r.Method,
 	}
+}
+
+func (c *Context) Param(key string) string {
+	value, _ := c.Params[key]
+	return value
 }
 
 // PostForm 方法: 返回查询中指定组件的第一个值
