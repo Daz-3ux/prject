@@ -1,8 +1,9 @@
 package gee
 
 import (
-	"log"
+	//"log"
 	"net/http"
+	"strings"
 )
 
 type HandlerFunc func(*Context)
@@ -17,9 +18,9 @@ type (
 
 	// 整个框架的资源都是由 Engine 统一协调的
 	Engine struct {
-		*RouteGroup						// 继承嵌入类型的所有属性与方法
-		router *router
-		groups []*RouteGroup 	// store all groups
+		*RouteGroup // 继承嵌入类型的所有属性与方法
+		router      *router
+		groups      []*RouteGroup // store all groups
 	}
 )
 
@@ -45,7 +46,7 @@ func (group *RouteGroup) Group(prefix string) *RouteGroup {
 
 func (group *RouteGroup) addRoute(method string, comp string, handler HandlerFunc) {
 	pattern := group.prefix + comp
-	log.Printf("Route %4s - %s", method, pattern)
+	//log.Printf("Route %4s - %s", method, pattern)
 	group.engine.router.addRoute(method, pattern, handler)
 }
 
@@ -57,11 +58,22 @@ func (group *RouteGroup) POST(pattern string, handler HandlerFunc) {
 	group.addRoute("POST", pattern, handler)
 }
 
+func (group *RouteGroup) Use(middleware ...HandlerFunc) {
+	group.middlewares = append(group.middlewares, middleware...)
+}
+
 func (engine *Engine) RUN(addr string) (err error) {
 	return http.ListenAndServe(addr, engine)
 }
 
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	var middlewares []HandlerFunc
+	for _, group := range engine.groups {
+		if strings.HasPrefix(req.URL.Path, group.prefix) {
+			middlewares = append(middlewares, group.middlewares...)
+		}
+	}
 	c := newContext(w, req)
+	c.handlers = middlewares
 	engine.router.handle(c)
 }
