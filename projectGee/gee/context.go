@@ -23,7 +23,7 @@ type Context struct {
 	StatusCode int
 	// middleware
 	handlers []HandlerFunc
-	index   int
+	index   int 							// 记录当前执行到第几个中间件 
 }
 
 func newContext(w http.ResponseWriter, r *http.Request) *Context {
@@ -36,10 +36,12 @@ func newContext(w http.ResponseWriter, r *http.Request) *Context {
 	}
 }
 
+// 当在中间件中调用 Next 方法时,控制权交给下一个中间件
+// 调用到最后一个中间件后,再从后往前调用每个中间件在 Next 方法之后定义的部分
 func (c *Context) Next() {
 	c.index++
 	s := len(c.handlers)
-	for ; c.index < s; c.index++ {
+	for ; c.index < s; c.index++ { // 妙不可言
 		c.handlers[c.index](c)
 	}
 }
@@ -50,7 +52,8 @@ func (c *Context) Fail(code int, err string) {
 }
 
 func (c *Context) Param(key string) string {
-	value, _ := c.Params[key]
+	//value, _ := c.Params[key]
+	value := c.Params[key]
 	return value
 }
 

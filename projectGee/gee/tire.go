@@ -95,15 +95,15 @@ func (n *node) search(parts []string, height int) *node {
 	return nil
 }
 
-// 查找所有完整的 URL, 保存到列表
-func (n *node) travel(list *([]*node)) {
-	if n.pattern != "" {
-		// 递归终止条件
-		*list = append(*list, n)
-	}
+// // 查找所有完整的 URL, 保存到列表
+// func (n *node) travel(list *([]*node)) {
+// 	if n.pattern != "" {
+// 		// 递归终止条件
+// 		*list = append(*list, n)
+// 	}
 
-	for _, child := range n.children {
-		// 一层一层的递归找 pattern 是非空的节点
-		child.travel(list)
-	}
-}
+// 	for _, child := range n.children {
+// 		// 一层一层的递归找 pattern 是非空的节点
+// 		child.travel(list)
+// 	}
+// }

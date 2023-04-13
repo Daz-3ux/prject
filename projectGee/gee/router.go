@@ -102,6 +102,11 @@ func (r *router) handle(c *Context) {
 		fmt.Println("HANDLE: params: ", params, "key: ", key, "method: ", c.Method, "pattern: ", n.pattern)
 		r.handlers[key](c)
 	} else {
+		/*
+				将从路由匹配得到的 Handler 添加到 c.handlers 列表中,执行 c.Next()
+				如果没有匹配到路由,则将默认的 NotFound Handler 添加到 c.handlers 列表中,执行 c.Next()
+				由于 c.handlers 列表中的 Handler 由 c.Next() 依次执行,因此 NotFound Handler 会被最后执行
+		*/
 		c.handlers = append(c.handlers, func(c *Context) {
 			c.String(http.StatusNotFound, "serverdaz told you: 404 NOT FOUND: %s\n", c.Path)
 		})

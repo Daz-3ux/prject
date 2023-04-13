@@ -78,6 +78,7 @@ func (group *RouteGroup) POST(pattern string, handler HandlerFunc) {
 	group.addRoute("POST", pattern, handler)
 }
 
+// 将中间件应用到某个 Group
 func (group *RouteGroup) Use(middleware ...HandlerFunc) {
 	group.middlewares = append(group.middlewares, middleware...)
 }
@@ -96,14 +97,14 @@ func (engine *Engine) RUN(addr string) (err error) {
 // Go 语言中: HTTP 服务器可以通过实现 http.Handler 接口来处理 HTTP 请求,
 // 这个接口只有一个方法 ServeHTTP -- 用来处理请求并向客户端发送响应
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	// 填充上下文
-	c := newContext(w, req)
 	var middlewares []HandlerFunc
 	for _, group := range engine.Groups {
 		if strings.HasPrefix(req.URL.Path, group.prefix) {
 			middlewares = append(middlewares, group.middlewares...)
 		}
 	}
+	// 填充上下文
+	c := newContext(w, req)
 	c.handlers = middlewares
 	engine.router.handle(c)
 }
