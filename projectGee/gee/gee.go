@@ -17,9 +17,9 @@ type (
 
 	// 整个框架的资源都是由 Engine 统一协调的
 	Engine struct {
-		*RouteGroup
+		*RouteGroup						// 继承嵌入类型的所有属性与方法
 		router *router
-		groups []*RouteGroup // store all groups
+		groups []*RouteGroup 	// store all groups
 	}
 )
 
