@@ -1,8 +1,8 @@
 package gee
 
 import (
+	//"log"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -42,7 +42,7 @@ func parsePattern(pattern string) []string {
 
 // 加路由方法
 func (r *router) addRoute(method string, pattern string, handler HandlerFunc) {
-	log.Printf("Route %4s - %s", method, pattern)
+	//log.Printf("Route %4s - %s", method, pattern)
 
 	parts := parsePattern(pattern)
 	key := method + "-" + pattern
@@ -102,6 +102,9 @@ func (r *router) handle(c *Context) {
 		fmt.Println("HANDLE: params: ", params, "key: ", key, "method: ", c.Method, "pattern: ", n.pattern)
 		r.handlers[key](c)
 	} else {
-		c.String(http.StatusNotFound, "serverdaz told you: 404 NOT FOUND: %s\n", c.Path)
+		c.handlers = append(c.handlers, func(c *Context) {
+			c.String(http.StatusNotFound, "serverdaz told you: 404 NOT FOUND: %s\n", c.Path)
+		})
 	}
+	c.Next()
 }

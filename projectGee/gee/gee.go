@@ -1,9 +1,10 @@
 package gee
 
 import (
-	"fmt"
-	"log"
+	//"fmt"
+	//"log"
 	"net/http"
+	"strings"
 )
 
 type HandlerFunc func(*Context)
@@ -65,7 +66,7 @@ func (group *RouteGroup) Group(prefix string) *RouteGroup {
 
 func (group *RouteGroup) addRoute(method string, comp string, handler HandlerFunc) {
 	pattern := group.prefix + comp
-	log.Printf("Route %4s - %s", method, pattern)
+	//log.Printf("Route %4s - %s", method, pattern)
 	group.engine.router.addRoute(method, pattern, handler)
 }
 
@@ -77,15 +78,19 @@ func (group *RouteGroup) POST(pattern string, handler HandlerFunc) {
 	group.addRoute("POST", pattern, handler)
 }
 
+func (group *RouteGroup) Use(middleware ...HandlerFunc) {
+	group.middlewares = append(group.middlewares, middleware...)
+}
+
 func (engine *Engine) RUN(addr string) (err error) {
 	return http.ListenAndServe(addr, engine)
 }
 
-// just for debug(with a ugly way)
-func (engine *Engine) returnRoute(method string, pattern string) {
-	node, params := engine.router.getRoute(method, pattern)
-	fmt.Println("node = ", node, "params = ", params)
-}
+// // just for debug(with a ugly way)
+// func (engine *Engine) returnRoute(method string, pattern string) {
+// 	node, params := engine.router.getRoute(method, pattern)
+// 	fmt.Println("node = ", node, "params = ", params)
+// }
 
 // 接管所有的 HTTP 请求
 // Go 语言中: HTTP 服务器可以通过实现 http.Handler 接口来处理 HTTP 请求,
@@ -93,6 +98,12 @@ func (engine *Engine) returnRoute(method string, pattern string) {
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// 填充上下文
 	c := newContext(w, req)
-	// 启动处理部分
+	var middlewares []HandlerFunc
+	for _, group := range engine.Groups {
+		if strings.HasPrefix(req.URL.Path, group.prefix) {
+			middlewares = append(middlewares, group.middlewares...)
+		}
+	}
+	c.handlers = middlewares
 	engine.router.handle(c)
 }
