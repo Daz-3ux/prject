@@ -15,7 +15,7 @@ func Logger() HandlerFunc {
 		// start timer
 		t := time.Now()
 		// process request
-		//c.Next()
+		c.Next()
 		// calculate resolution time
 		log.Printf("[%d] %s in %v", c.StatusCode, c.Req.RequestURI, time.Since(t))
 	}
