@@ -23,7 +23,9 @@ type Context struct {
 	StatusCode int
 	// middleware
 	handlers []HandlerFunc
-	index   int 							// 记录当前执行到第几个中间件 
+	index    int
+	// engine pointer
+	engine *Engine
 }
 
 func newContext(w http.ResponseWriter, r *http.Request) *Context {
@@ -101,9 +103,10 @@ func (c *Context) Data(code int, data []byte) {
 	c.Writer.Write(data)
 }
 
-// 将一个 HTML 字符串写入响应体
-func (c *Context) HTML(code int, html string) {
+func (c *Context) HTML(code int, name string, data interface{}) {
 	c.SetHeader("Content-Type", "text/html")
 	c.Status(code)
-	c.Writer.Write([]byte(html))
+	if err := c.engine.htmlTemplates.ExecuteTemplate(c.Writer, name, data); err != nil {
+		c.Fail(500, err.Error())
+	}
 }

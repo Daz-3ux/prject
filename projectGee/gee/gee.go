@@ -3,7 +3,9 @@ package gee
 import (
 	//"fmt"
 	//"log"
+	"html/template"
 	"net/http"
+	"path"
 	"strings"
 )
 
@@ -32,6 +34,8 @@ type (
 		router *router				// 路由器实例
 		// 用于存储管理所有的路由分组
 		Groups []*RouteGroup 	// 所有分组的列表
+		htmlTemplates *template.Template // for html render: 将所有模板加载入内存
+		funcMap       template.FuncMap   // for html render: 所有的自定义模板渲染函数
 	}
 )
 
@@ -49,6 +53,14 @@ func New() *Engine {
 	engine.Groups = []*RouteGroup{engine.RouteGroup} // Groups中的第一个元素在此处添加,为 nil
 
 	return engine
+}
+
+func (engine *Engine) SetFuncMap(funcMap template.FuncMap) {
+	engine.funcMap = funcMap
+}
+
+func (engine *Engine) LoadHTMLGlob(pattern string) {
+	engine.htmlTemplates = template.Must(template.New("").Funcs(engine.funcMap).ParseGlob(pattern))
 }
 
 // 创建一个新的路由分组,并将其添加到路由器实例的分组列表中
@@ -83,6 +95,31 @@ func (group *RouteGroup) Use(middleware ...HandlerFunc) {
 	group.middlewares = append(group.middlewares, middleware...)
 }
 
+// create static handler
+func (group *RouteGroup) createStaticHandler(relativePath string, fs http.FileSystem) HandlerFunc {
+	absolution := path.Join(group.prefix, relativePath)
+	fileServer := http.StripPrefix(absolution, http.FileServer(fs))
+	return func(c *Context) {
+		file := c.Param("filepath")
+		// check if file exist / or if we have permission to access it
+		if _, err := fs.Open(file); err != nil {
+			c.Status(http.StatusNotFound)
+			return
+		}
+
+		fileServer.ServeHTTP(c.Writer, c.Req)
+	}
+}
+
+// serve static files
+// r.Static("/assets", "/usr/daz/blog/static")
+func (group *RouteGroup) Static(relativePath string, root string) {
+	handler := group.createStaticHandler(relativePath, http.Dir(root))
+	urlPattern := path.Join(relativePath, "*/filepath")
+	// Register GET handlers
+	group.GET(urlPattern, handler)
+}
+
 func (engine *Engine) RUN(addr string) (err error) {
 	return http.ListenAndServe(addr, engine)
 }
@@ -106,5 +143,6 @@ func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// 填充上下文
 	c := newContext(w, req)
 	c.handlers = middlewares
+	c.engine = engine
 	engine.router.handle(c)
 }
