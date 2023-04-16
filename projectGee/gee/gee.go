@@ -3,6 +3,7 @@ package gee
 import (
 	//"fmt"
 	//"log"
+	"fmt"
 	"html/template"
 	"net/http"
 	"path"
@@ -55,10 +56,12 @@ func New() *Engine {
 	return engine
 }
 
+// 为所有模板添加自定义函数
 func (engine *Engine) SetFuncMap(funcMap template.FuncMap) {
 	engine.funcMap = funcMap
 }
 
+// 将所有模板加载入内存
 func (engine *Engine) LoadHTMLGlob(pattern string) {
 	engine.htmlTemplates = template.Must(template.New("").Funcs(engine.funcMap).ParseGlob(pattern))
 }
@@ -98,6 +101,7 @@ func (group *RouteGroup) Use(middleware ...HandlerFunc) {
 // create static handler
 func (group *RouteGroup) createStaticHandler(relativePath string, fs http.FileSystem) HandlerFunc {
 	absolution := path.Join(group.prefix, relativePath)
+	fmt.Println("absolution = ", absolution)
 	fileServer := http.StripPrefix(absolution, http.FileServer(fs))
 	return func(c *Context) {
 		file := c.Param("filepath")
