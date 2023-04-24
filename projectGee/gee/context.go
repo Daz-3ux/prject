@@ -28,6 +28,11 @@ type Context struct {
 	engine *Engine
 }
 
+func (c *Context) Param(key string) string {
+	value, _ := c.Params[key]
+	return value
+}
+
 func newContext(w http.ResponseWriter, r *http.Request) *Context {
 	return &Context{
 		Writer: w,
@@ -51,12 +56,6 @@ func (c *Context) Next() {
 func (c *Context) Fail(code int, err string) {
 	c.index = len(c.handlers)
 	c.JSON(code, H{"message": err})
-}
-
-func (c *Context) Param(key string) string {
-	//value, _ := c.Params[key]
-	value := c.Params[key]
-	return value
 }
 
 // PostForm 方法: 返回查询中指定组件的第一个值
