@@ -6,14 +6,19 @@ import (
 
 // Cache is a LRU cache, not safe fot concurrent
 type Cache struct {
+	// maxBytes 为 0 时代表不对内存大小设限
 	maxBytes int64
+	// nBytes 为已使用内存
 	nBytes   int64
+	// 双向链表: Front 放置最新使用节点
 	ll       *list.List
+	// 缓存
 	cache    map[string]*list.Element
-	// optional and executed when an entry is purged
+	// 回调函数: optional and executed when an entry is purged
 	onEvicated func(key string, value Value)
 }
 
+// 双向链表的数据类型,定义 Value any, 定义接口
 type entry struct {
 	key   string
 	value Value
@@ -37,7 +42,7 @@ func New(maxBytes int64, onEvicated func(string, Value)) *Cache {
 // Get look ups a key's value
 func (c *Cache) Get(key string) (value Value, ok bool) {
 	if ele, ok := c.cache[key]; ok {
-		// Conventionally, front refers to the tail of the queue
+		// Conventionally, front refers to the tail of the queue -- 约定 front 作为队尾
 		c.ll.MoveToFront(ele)
 		kv := ele.Value.(*entry)
 		return kv.value, true
@@ -47,6 +52,7 @@ func (c *Cache) Get(key string) (value Value, ok bool) {
 
 // RemoveOldest removes the oldest item
 func (c *Cache) RemoveOldest() {
+	// 从队首取元素
 	ele := c.ll.Back()
 	if ele != nil {
 		c.ll.Remove(ele)
