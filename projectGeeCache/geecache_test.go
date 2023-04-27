@@ -11,6 +11,8 @@ func TestGetter(t *testing.T) {
 	/*
 		f 是一个 Getter 接口类型的变量
 		但是实际上它被赋值为一个 GetterFunc 类型的实例
+		GetterFunc 类型虽然没有显示声明它实现了 Getter 接口,但它
+		实现了 Getter 接口中定义的所有方法,所以它被视为 Getter 接口的实现
 	*/
 	var f Getter = GetterFunc(func(key string) ([]byte, error) {
 		return []byte(key), nil
@@ -30,6 +32,7 @@ var db = map[string]string{
 
 func TestGet(t *testing.T) {
 	loadCounts := make(map[string]int, len(db))
+	// scors缓存组 2048大小 实现了Getter接口
 	gee := NewGroup("scores", 2<<10, GetterFunc(
 		func(key string) ([]byte, error) {
 			log.Println("[SlowDB] search key", key)
