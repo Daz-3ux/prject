@@ -3,17 +3,17 @@ package main
 import (
 	"fmt"
 
-	"github.com/Daz-3ux/project/multi-crawler/pkg/crawl"
+	"github.com/Daz-3ux/project/tree/main/multi-crawler/pkg/crawl"
 )
 
 func main() {
-	config := pkg.Crawler{
-		StartURL: "https://movie.douban.com/top250",
-		MaxDepth: 2,
+	config := crawl.Crawler{
+		StartURL:       "https://movie.douban.com/top250",
+		MaxDepth:       2,
 		MaxConcurrency: 5,
 	}
 
-	results, err := pkg.Crawl(config)
+	results, err := crawl.Crawl(config)
 	fmt.Println(results)
 	if err != nil {
 		fmt.Println(err)
@@ -24,6 +24,3 @@ func main() {
 		fmt.Println(result)
 	}
 }
-
-
-

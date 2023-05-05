@@ -5,7 +5,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/Daz-3ux/project/multi-crawler/pkg/extractHTTP"
+	"extractHTTP"
 )
 
 // Crawler is a struct that contains the crawler's data
