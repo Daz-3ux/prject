@@ -38,7 +38,7 @@ func GetFromSource(getter Getter, key string) []byte {
 	return nil
 }
 ```
-
+**注意,此时 getter.Get() 尚未实现,我们可以通过以下方法实现**
 - `通过匿名函数实现 Getter 接口`
 ```go
 GetFromSource(GetterFunc(func(key string) ([]byte, error) {
@@ -166,3 +166,56 @@ func (mux *ServeMux) HandleFunc(pattern string, handler func(ResponseWriter, *Re
 	mux.Handle(pattern, HandlerFunc(handler))
 }
 ```
+---
+- 除此之外,想要理解 ServeHTTP 当然最好参考经典的 `类echo` 服务器
+```go
+package main
+
+import (
+	"log"
+	"net/http"
+)
+
+type server int
+
+func (h *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.URL.Path)
+	w.Write([]byte("Hello World!"))
+}
+
+func main() {
+	var s server
+	http.ListenAndServe("localhost:9999", &s)
+}
+```
+- 此处再重复一次 Handler 的定义
+```go
+// 接口类型
+type Handler interface {
+	ServeHTTP(ResponseWriter, *Request)
+}
+
+// 接口型函数
+type HandlerFunc func(ResponseWriter, *Request)
+
+func (f HandlerFunc) ServeHTTP(w ResponseWriter, r *Request) {
+	f(w, r)
+}
+```
+- **详细解释**:
+- 定义
+  - Handler 是接口类型,定义了一个 ServeHTTP 方法
+  - HandlerFunc 是一个函数类型,接受两个参数
+  - 为了让 HandlerFunc 类型`实现 Handler`接口,我们需要定义一个 ServeHTTP 方法,其已经被定义为`f(w, r)`
+    - 其功能很简单:只是`调用函数 f 并传入相同参数`
+    - `任何 HandlerFunc 类型的函数都可以作为 Handler 接口使用`
+- 实现
+  - server 类型实现了 Handler 接口
+    - 因为其定义了 ServeHTTP 方法
+    - 意味着可以使用 server 类型的变量作为一个 Handler
+    - &s 是一个指向 s 的指针，因为在Go中可以使用指针接收者来实现接口。
+
+---
+参考:
+- [动手写分布式缓存](https://geektutu.com/post/geecache-day2.html)
+- [Go 接口型函数的使用场景](https://geektutu.com/post/7days-golang-q1.html)

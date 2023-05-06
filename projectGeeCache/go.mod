@@ -1,7 +1,9 @@
-module geecache
+module main
 
 go 1.20
 
-require lru v0.0.0
+require geecache  v0.0.0
+require lru       v0.0.0
 
-replace lru => ./lru
+replace geecache => ./geecache
+replace lru      => ./geecache/lru

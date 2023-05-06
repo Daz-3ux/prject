@@ -2,6 +2,7 @@
 		使用 sync.Mutex 封装 LRU 方法
 		使其支持并发的读写
 */
+// 并发控制
 package geecache
 
 import (
