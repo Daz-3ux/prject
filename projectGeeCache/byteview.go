@@ -1,3 +1,4 @@
+// 缓存值的抽象与封装
 package geecache
 
 // A ByteView holds an immutable view of bytes(read-only)
