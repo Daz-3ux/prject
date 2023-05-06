@@ -13,8 +13,8 @@ const defauleBasePath = "/_geecache/"
 // HTTPPool implements PeerPicker for a pool of HTTP peers
 type HTTPPool struct {
 	// this peer's base URL, e.g. "https://example.net:8080"
-	self			string
-	basePath	string
+	self			string 	// 自身地址
+	basePath	string	// 加一段 Path 是好习惯
 }
 
 // NewHTTPPool initializes an HTTP pool of peers
@@ -32,6 +32,7 @@ func (p *HTTPPool) Log(format string, v ...interface{}) {
 
 // ServeHTTP handle all http requests
 func (p *HTTPPool) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// 判断路径前缀是否是 basePath
 	if !strings.HasPrefix(r.URL.Path, p.basePath) {
 		panic("HTTPPool serving unexpected path: " + r.URL.Path)
 	}
@@ -61,5 +62,6 @@ func (p *HTTPPool) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/octet-stream")
+	// 写缓存值
 	w.Write(view.ByteSlice())
 }

@@ -8,6 +8,7 @@ import (
 	"geecache"
 )
 
+// 模拟数据库 too simple
 var db = map[string]string {
 	"Tom": 	"630",
 	"Jack":	"589",
