@@ -13,6 +13,11 @@ func TestHashing(t *testing.T) {
 
 	// Given the above hash function, this will give replicas with "hashes":
 	// 2, 4, 6, 12, 14, 16, 22, 24, 26
+	/*
+		6 16 26
+		4 14 24
+		2 12 22
+	*/
 	hash.Add("6", "4", "2")
 
 	testCases := map[string]string {
